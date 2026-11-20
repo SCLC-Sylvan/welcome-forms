@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Welcome to Sylvan!</title>
+<style>
+  /* ── CONFIG-DRIVEN BRANDING ── */
+  :root {
+    --navy:       #1B4F8A;
+    --navy-dark:  #153d6b;
+    --green:      #5DB85C;
+    --green-dark: #4a9e49;
+    --gray-bg:    #F4F6F9;
+    --gray-border:#DDE2EA;
+    --text:       #1a1a2e;
+    --muted:      #6B7280;
+    --white:      #ffffff;
+    --error:      #DC2626;
+    --card-shadow:0 2px 16px rgba(0,0,0,0.10);
+    --radius:     14px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    background: var(--gray-bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: var(--navy);
+    color: var(--white);
+    padding: 18px 24px 14px;
+    text-align: center;
+  }
+  .header-logo { font-size: 22px; font-weight: 800; letter-spacing: 0.3px; }
+  .header-logo span { color: var(--green); }
+  .header-sub { font-size: 13px; color: rgba(255,255,255,0.75); margin-top: 2px; }
+
+  /* ── PROGRESS ── */
+  .progress-wrap {
+    background: var(--white);
+    padding: 14px 24px 10px;
+    border-bottom: 1px solid var(--gray-border);
+    position: sticky; top: 0; z-index: 10;
+  }
+  .progress-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 7px;
+  }
+  .progress-label { font-size: 11px; color: var(--muted); font-weight: 600; }
+  .progress-label.active { color: var(--navy); }
+  .progress-label.done { color: var(--green-dark); }
+  .progress-bar-bg {
+    height: 5px;
+    background: var(--gray-border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--navy), var(--green));
+    border-radius: 3px;
+    transition: width 0.4s ease;
+  }
+  .step-counter { font-size: 12px; color: var(--muted); text-align: right; margin-top: 6px; }
+
+  /* ── MAIN CARD ── */
+  .main { max-width: 540px; margin: 0 auto; padding: 20px 16px 40px; }
+
+  .card {
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--card-shadow);
+    padding: 26px 22px;
+    margin-bottom: 16px;
+    display: none;
+    animation: fadeIn 0.25s ease;
+  }
+  .card.active { display: block; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+
+  .card-title {
+    font-size: 19px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 4px;
+  }
+  .card-desc {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 20px;
+    line-height: 1.5;
+  }
+
+  /* ── FORM ELEMENTS ── */
+  .field { margin-bottom: 16px; }
+  .field label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  .field label .req { color: var(--error); margin-left: 2px; }
+  .field input[type="text"],
+  .field input[type="email"],
+  .field input[type="tel"],
+  .field input[type="date"],
+  .field select,
+  .field textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1.5px solid var(--gray-border);
+    border-radius: 9px;
+    font-size: 15px;
+    color: var(--text);
+    background: var(--white);
+    appearance: none;
+    -webkit-appearance: none;
+    transition: border-color 0.2s;
+    font-family: inherit;
+  }
+  .field input:focus,
+  .field select:focus,
+  .field textarea:focus {
+    outline: none;
+    border-color: var(--navy);
+    box-shadow: 0 0 0 3px rgba(27,79,138,0.10);
+  }
+  .field textarea { resize: vertical; min-height: 80px; }
+  .field .error-msg {
+    font-size: 12px;
+    color: var(--error);
+    margin-top: 4px;
+    display: none;
+  }
+  .field.has-error input,
+  .field.has-error select,
+  .field.has-error textarea { border-color: var(--error); }
+  .field.has-error .error-msg { display: block; }
+
+  .row { display: flex; gap: 12px; }
+  .row .field { flex: 1; }
+
+  /* ── RADIO / CHECKBOX GROUP ── */
+  .option-group { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 2px; }
+  .option-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 15px;
+    border: 1.5px solid var(--gray-border);
+    border-radius: 24px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    cursor: pointer;
+    background: var(--white);
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .option-btn input { display: none; }
+  .option-btn.selected {
+    background: var(--navy);
+    border-color: var(--navy);
+    color: var(--white);
+    font-weight: 600;
+  }
+  .option-btn.selected-green {
+    background: var(--green);
+    border-color: var(--green-dark);
+    color: var(--white);
+  }
+
+  /* ── TOGGLE SECTION ── */
+  .toggle-section {
+    background: #F0F4FA;
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-top: 4px;
+    display: none;
+  }
+  .toggle-section.visible { display: block; }
+
+  /* ── DIVIDER ── */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--gray-border);
+    margin: 20px 0;
+  }
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--muted);
+    margin-bottom: 14px;
+  }
+
+  /* ── BUTTONS ── */
+  .btn-row { display: flex; gap: 10px; margin-top: 24px; }
+  .btn {
+    flex: 1;
+    padding: 15px 20px;
+    border-radius: 10px;
+    border: none;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+  }
+  .btn-primary { background: var(--navy); color: var(--white); }
+  .btn-primary:active { background: var(--navy-dark); transform: scale(0.98); }
+  .btn-secondary {
+    background: var(--white);
+    color: var(--navy);
+    border: 1.5px solid var(--navy);
+    flex: 0 0 auto;
+    padding: 15px 18px;
+    font-size: 15px;
+  }
+  .btn-submit { background: var(--green); color: var(--white); }
+  .btn-submit:active { background: var(--green-dark); }
+
+  /* ── REVIEW CARD ── */
+  .review-section { margin-bottom: 18px; }
+  .review-section-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--muted);
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--gray-border);
+  }
+  .review-row { display: flex; gap: 8px; margin-bottom: 7px; align-items: flex-start; }
+  .review-key { font-size: 12px; color: var(--muted); min-width: 130px; flex-shrink: 0; }
+  .review-val { font-size: 14px; font-weight: 500; color: var(--text); }
+
+  /* ── SUCCESS ── */
+  .success-screen {
+    text-align: center;
+    padding: 40px 20px;
+    display: none;
+  }
+  .success-screen.active { display: block; }
+  .success-icon {
+    width: 72px; height: 72px;
+    background: var(--green);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 20px;
+    font-size: 36px;
+  }
+  .success-title { font-size: 24px; font-weight: 800; color: var(--navy); margin-bottom: 10px; }
+  .success-msg { font-size: 15px; color: var(--muted); line-height: 1.6; }
+
+  /* ── OPTIONAL PARENT 2 TOGGLE ── */
+  .add-parent-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--navy);
+    background: none;
+    border: 1.5px dashed var(--navy);
+    border-radius: 9px;
+    padding: 10px 16px;
+    cursor: pointer;
+    width: 100%;
+    justify-content: center;
+    margin-top: 4px;
+    font-family: inherit;
+  }
+
+  /* ── HINT TEXT ── */
+  .hint { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+  .consent-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px;
+    background: #F0F4FA;
+    border-radius: 9px;
+    margin-top: 8px;
+  }
+  .consent-row input[type="checkbox"] {
+    width: 20px; height: 20px;
+    accent-color: var(--navy);
+    flex-shrink: 0;
+    margin-top: 2px;
+    cursor: pointer;
+  }
+  .consent-row label { font-size: 13px; color: var(--text); cursor: pointer; line-height: 1.4; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     CENTER CONFIG — edit these two lines per center
+     ══════════════════════════════════════════ -->
+<script>
+  const CENTER_NAME      = "Sylvan Learning — Torrance";
+  const FORMSPREE_URL    = "https://formspree.io/f/REPLACE_WITH_TORRANCE_CODE";  // get from formspree.io
+</script>
+<!-- ══════════════════════════════════════════ -->
+
+<div class="header">
+  <img src="data:image/png;base64,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" alt="Sylvan Learning" style="height:52px;">
+  <div class="header-sub" id="centerSubtitle">Welcome — we're glad you're here</div>
+</div>
+
+<div class="progress-wrap">
+  <div class="progress-labels">
+    <span class="progress-label" id="pl-1">Student</span>
+    <span class="progress-label" id="pl-2">Contact</span>
+    <span class="progress-label" id="pl-3">Why Here</span>
+    <span class="progress-label" id="pl-4">Profile</span>
+    <span class="progress-label" id="pl-5">Goals</span>
+    <span class="progress-label" id="pl-6">Schedule</span>
+    <span class="progress-label" id="pl-7">Review</span>
+  </div>
+  <div class="progress-bar-bg">
+    <div class="progress-bar-fill" id="progressFill" style="width:14%"></div>
+  </div>
+  <div class="step-counter" id="stepCounter">Step 1 of 7</div>
+</div>
+
+<div class="main">
+
+  <!-- ── STEP 1: STUDENT INFO ── -->
+  <div class="card active" id="step-1">
+    <div class="card-title">About your student</div>
+    <div class="card-desc">Let's start with some basics about who we'll be working with.</div>
+
+    <div class="field" id="f-studentName">
+      <label>Student's full name <span class="req">*</span></label>
+      <input type="text" id="studentName" placeholder="First and last name" autocomplete="off">
+      <div class="error-msg">Please enter the student's name.</div>
+    </div>
+
+    <div class="row">
+      <div class="field" id="f-studentDOB">
+        <label>Date of birth <span class="req">*</span></label>
+        <input type="date" id="studentDOB">
+        <div class="error-msg">Required.</div>
+      </div>
+      <div class="field" id="f-studentGrade">
+        <label>Grade <span class="req">*</span></label>
+        <select id="studentGrade">
+          <option value="">Select…</option>
+          <option>Kindergarten</option>
+          <option>1st Grade</option>
+          <option>2nd Grade</option>
+          <option>3rd Grade</option>
+          <option>4th Grade</option>
+          <option>5th Grade</option>
+          <option>6th Grade</option>
+          <option>7th Grade</option>
+          <option>8th Grade</option>
+          <option>9th Grade</option>
+          <option>10th Grade</option>
+          <option>11th Grade</option>
+          <option>12th Grade</option>
+          <option>College</option>
+          <option>Adult Learner</option>
+        </select>
+        <div class="error-msg">Required.</div>
+      </div>
+    </div>
+
+    <div class="field" id="f-studentSchool">
+      <label>School name</label>
+      <input type="text" id="studentSchool" placeholder="e.g. Lincoln Elementary">
+    </div>
+
+    <div class="field" id="f-siblings">
+      <label>Sibling(s) name(s) &amp; grade(s) <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
+      <input type="text" id="siblings" placeholder="e.g. Sofia, 3rd grade">
+      <div class="hint">We love helping whole families!</div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="goTo(2)">Next →</button>
+    </div>
+  </div>
+
+  <!-- ── STEP 2: CONTACT INFO ── -->
+  <div class="card" id="step-2">
+    <div class="card-title">Your contact info</div>
+    <div class="card-desc">How should we reach you? We'll use this to confirm your appointment.</div>
+
+    <div class="section-label">Parent / Guardian 1</div>
+
+    <div class="field" id="f-parentName">
+      <label>Your full name <span class="req">*</span></label>
+      <input type="text" id="parentName" placeholder="First and last name" autocomplete="name">
+      <div class="error-msg">Please enter your name.</div>
+    </div>
+
+    <div class="field" id="f-relationship">
+      <label>Relationship to student <span class="req">*</span></label>
+      <select id="relationship">
+        <option value="">Select…</option>
+        <option>Parent</option>
+        <option>Guardian</option>
+        <option>Grandparent</option>
+        <option>Other</option>
+      </select>
+      <div class="error-msg">Required.</div>
+    </div>
+
+    <div class="row">
+      <div class="field" id="f-phone">
+        <label>Phone <span class="req">*</span></label>
+        <input type="tel" id="phone" placeholder="(555) 000-0000" autocomplete="tel">
+        <div class="error-msg">Required.</div>
+      </div>
+      <div class="field">
+        <label>Phone type</label>
+        <select id="phoneType">
+          <option value="Mobile">Mobile</option>
+          <option value="Home">Home</option>
+          <option value="Work">Work</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field" id="f-email">
+      <label>Email <span class="req">*</span></label>
+      <input type="email" id="email" placeholder="you@email.com" autocomplete="email">
+      <div class="error-msg">Please enter a valid email.</div>
+    </div>
+
+    <div class="field">
+      <label>Preferred contact method</label>
+      <div class="option-group" id="contactPref">
+        <label class="option-btn selected"><input type="radio" name="contactPref" value="Phone" checked> 📞 Phone</label>
+        <label class="option-btn"><input type="radio" name="contactPref" value="Text"> 💬 Text</label>
+        <label class="option-btn"><input type="radio" name="contactPref" value="Email"> ✉️ Email</label>
+      </div>
+    </div>
+
+    <div class="consent-row">
+      <input type="checkbox" id="smsConsent1" checked>
+      <label for="smsConsent1">I consent to receive scheduling updates, program changes, and special offers via text message.</label>
+    </div>
+
+    <hr class="divider">
+
+    <button class="add-parent-btn" id="addParent2Btn" onclick="toggleParent2()">
+      ＋ Add a second parent / guardian
+    </button>
+
+    <div id="parent2Section" style="display:none; margin-top:16px;">
+      <div class="section-label">Parent / Guardian 2</div>
+      <div class="field">
+        <label>Full name</label>
+        <input type="text" id="parent2Name" placeholder="First and last name">
+      </div>
+      <div class="field">
+        <label>Relationship to student</label>
+        <select id="relationship2">
+          <option value="">Select…</option>
+          <option>Parent</option>
+          <option>Guardian</option>
+          <option>Grandparent</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>Phone</label>
+          <input type="tel" id="phone2" placeholder="(555) 000-0000">
+        </div>
+        <div class="field">
+          <label>Phone type</label>
+          <select id="phoneType2">
+            <option value="Mobile">Mobile</option>
+            <option value="Home">Home</option>
+            <option value="Work">Work</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Email</label>
+        <input type="email" id="email2" placeholder="you@email.com">
+      </div>
+      <div class="consent-row">
+        <input type="checkbox" id="smsConsent2" checked>
+        <label for="smsConsent2">I consent to receive scheduling updates, program changes, and special offers via text message.</label>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goTo(1)">← Back</button>
+      <button class="btn btn-primary" onclick="goTo(3)">Next →</button>
+    </div>
+  </div>
+
+  <!-- ── STEP 3: WHY YOU'RE HERE ── -->
+  <div class="card" id="step-3">
+    <div class="card-title">Why you're here</div>
+    <div class="card-desc">This helps us make the most of your visit from the moment you walk in.</div>
+
+    <div class="field" id="f-prompted">
+      <label>What prompted you to reach out to Sylvan? <span class="req">*</span></label>
+      <textarea id="prompted" placeholder="Tell us what's going on — a recent grade, a test coming up, a concern your teacher raised…"></textarea>
+      <div class="error-msg">Please share what brought you here.</div>
+    </div>
+
+    <div class="field" id="f-mostImportant">
+      <label>What's the most important thing you'd like to discuss today? <span class="req">*</span></label>
+      <textarea id="mostImportant" placeholder="e.g. Reading comprehension, upcoming SAT, building confidence in math…"></textarea>
+      <div class="error-msg">Required.</div>
+    </div>
+
+    <div class="field">
+      <label>Has anyone in your family previously attended Sylvan?</label>
+      <div class="option-group" id="prevSylvan">
+        <label class="option-btn"><input type="radio" name="prevSylvan" value="Yes"> ✅ Yes</label>
+        <label class="option-btn selected"><input type="radio" name="prevSylvan" value="No" checked> No</label>
+      </div>
+    </div>
+
+    <div id="prevSylvanDetails" class="toggle-section">
+      <div class="field">
+        <label>When and which location?</label>
+        <input type="text" id="prevSylvanWhere" placeholder="e.g. Northridge, 2019">
+      </div>
+    </div>
+
+    <div class="field" style="margin-top:16px;">
+      <label>How did you hear about us?</label>
+      <select id="referral">
+        <option value="">Select…</option>
+        <option>Friend or family referral</option>
+        <option>Google search</option>
+        <option>Social media</option>
+        <option>School recommendation</option>
+        <option>Drove by / saw the center</option>
+        <option>Returning family</option>
+        <option>Other</option>
+      </select>
+    </div>
+
+    <div id="referralNameSection" class="toggle-section" style="margin-top:4px;">
+      <div class="field">
+        <label>Who referred you? We'd love to thank them!</label>
+        <input type="text" id="referralName" placeholder="Name">
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goTo(2)">← Back</button>
+      <button class="btn btn-primary" onclick="goTo(4)">Next →</button>
+    </div>
+  </div>
+
+  <!-- ── STEP 4: STUDENT PROFILE ── -->
+  <div class="card" id="step-4">
+    <div class="card-title">Student profile</div>
+    <div class="card-desc">Help us understand where your student is right now.</div>
+
+    <div class="field">
+      <label>How is your student performing overall?</label>
+      <div class="option-group" id="gradeLevel" style="flex-direction:column; gap:8px;">
+        <label class="option-btn" style="justify-content:flex-start;border-radius:9px;width:100%"><input type="radio" name="gradeLevel" value="Below grade level"> 📉 Below grade level</label>
+        <label class="option-btn" style="justify-content:flex-start;border-radius:9px;width:100%"><input type="radio" name="gradeLevel" value="At grade level"> 📊 At grade level</label>
+        <label class="option-btn" style="justify-content:flex-start;border-radius:9px;width:100%"><input type="radio" name="gradeLevel" value="Slightly above grade level"> 📈 Slightly above grade level</label>
+        <label class="option-btn" style="justify-content:flex-start;border-radius:9px;width:100%"><input type="radio" name="gradeLevel" value="Considerably above grade level"> 🚀 Considerably above grade level</label>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="field">
+      <label>Where would you like to see improvement? <span style="font-weight:400;color:var(--muted)">(select all that apply)</span></label>
+      <div class="option-group" id="subjects" style="margin-top:6px;">
+        <label class="option-btn"><input type="checkbox" value="Reading"> 📖 Reading</label>
+        <label class="option-btn"><input type="checkbox" value="Math"> ➗ Math</label>
+        <label class="option-btn"><input type="checkbox" value="Writing"> ✏️ Writing</label>
+        <label class="option-btn"><input type="checkbox" value="Study Skills"> 📚 Study Skills</label>
+        <label class="option-btn"><input type="checkbox" value="Test Prep"> 📝 Test Prep</label>
+        <label class="option-btn"><input type="checkbox" value="Homework Help"> 🏠 Homework Help</label>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="field">
+      <label>Does your student have an IEP or receive special accommodations?</label>
+      <div class="option-group" id="iep">
+        <label class="option-btn"><input type="radio" name="iep" value="Yes"> Yes</label>
+        <label class="option-btn selected"><input type="radio" name="iep" value="No" checked> No</label>
+      </div>
+    </div>
+
+    <div id="iepDetails" class="toggle-section">
+      <div class="field">
+        <label>Please describe the accommodations or additional support your student receives</label>
+        <textarea id="iepDesc" placeholder="e.g. Extended time, speech services, resource specialist…"></textarea>
+      </div>
+      <div class="field" style="margin-top:4px;">
+        <label>Would you be willing to share a copy of the support plan with us?</label>
+        <div class="option-group" id="shareIEP">
+          <label class="option-btn"><input type="radio" name="shareIEP" value="Yes"> Yes</label>
+          <label class="option-btn selected"><input type="radio" name="shareIEP" value="No" checked> Not right now</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goTo(3)">← Back</button>
+      <button class="btn btn-primary" onclick="goTo(5)">Next →</button>
+    </div>
+  </div>
+
+  <!-- ── STEP 5: GOALS ── -->
+  <div class="card" id="step-5">
+    <div class="card-title">Your goals</div>
+    <div class="card-desc">What does success look like for your student?</div>
+
+    <div class="field">
+      <label>What would you like to achieve with Sylvan?</label>
+      <textarea id="goals" placeholder="e.g. Improve reading by one grade level, pass the SAT, build confidence and independence…"></textarea>
+    </div>
+
+    <div class="field">
+      <label>What's your timeline?</label>
+      <div class="option-group" id="timeline" style="flex-direction:column; gap:8px;">
+        <label class="option-btn" style="justify-content:flex-start;border-radius:9px;width:100%"><input type="radio" name="timeline" value="Urgent — a few weeks"> ⚡ Urgent — a few weeks (test, grade, specific event)</label>
+        <label class="option-btn" style="justify-content:flex-start;border-radius:9px;width:100%"><input type="radio" name="timeline" value="This school year"> 📅 This school year</label>
+        <label class="option-btn" style="justify-content:flex-start;border-radius:9px;width:100%"><input type="radio" name="timeline" value="Long-term / ongoing"> 🌱 Long-term / ongoing</label>
+        <label class="option-btn" style="justify-content:flex-start;border-radius:9px;width:100%"><input type="radio" name="timeline" value="Not sure yet"> 🤷 Not sure yet</label>
+      </div>
+    </div>
+
+    <div class="field" style="margin-top:16px;">
+      <label>Anything else we should know about your student or your family goals?</label>
+      <textarea id="anythingElse" placeholder="Anything that would help us prepare for your visit…"></textarea>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goTo(4)">← Back</button>
+      <button class="btn btn-primary" onclick="goTo(6)">Next →</button>
+    </div>
+  </div>
+
+  <!-- ── STEP 6: SCHEDULING + PAYMENT ── -->
+  <div class="card" id="step-6">
+    <div class="card-title">Scheduling &amp; preferences</div>
+    <div class="card-desc">Help us set up a schedule that actually works for your family.</div>
+
+    <div class="field">
+      <label>Which days do <strong>NOT</strong> work for your family?</label>
+      <div class="option-group" id="unavailDays">
+        <label class="option-btn"><input type="checkbox" value="Monday"> Mon</label>
+        <label class="option-btn"><input type="checkbox" value="Tuesday"> Tue</label>
+        <label class="option-btn"><input type="checkbox" value="Wednesday"> Wed</label>
+        <label class="option-btn"><input type="checkbox" value="Thursday"> Thu</label>
+        <label class="option-btn"><input type="checkbox" value="Friday"> Fri</label>
+        <label class="option-btn"><input type="checkbox" value="Saturday"> Sat</label>
+        <label class="option-btn"><input type="checkbox" value="Sunday"> Sun</label>
+      </div>
+      <div class="hint">Select any days that don't work — we'll build around them.</div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="field">
+      <label>Best time to reach you or schedule calls</label>
+      <div class="option-group" id="bestTime">
+        <label class="option-btn"><input type="checkbox" value="Morning"> ☀️ Morning</label>
+        <label class="option-btn"><input type="checkbox" value="Lunchtime"> 🕛 Lunchtime</label>
+        <label class="option-btn"><input type="checkbox" value="Afternoon"> 🌤 Afternoon</label>
+        <label class="option-btn"><input type="checkbox" value="Evening"> 🌙 Evening</label>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="field">
+      <label>What matters most to you when choosing a payment option?</label>
+      <div class="option-group" id="paymentPref" style="flex-direction:column; gap:8px;">
+        <label class="option-btn" style="justify-content:flex-start;border-radius:9px;width:100%"><input type="radio" name="payment" value="One-time payment"> 💳 One-time payment (best value overall)</label>
+        <label class="option-btn" style="justify-content:flex-start;border-radius:9px;width:100%"><input type="radio" name="payment" value="Lowest monthly cost"> 📅 Lowest monthly cost</label>
+        <label class="option-btn" style="justify-content:flex-start;border-radius:9px;width:100%"><input type="radio" name="payment" value="Flexible payment plan"> 🔄 Flexible / payment plan options</label>
+        <label class="option-btn" style="justify-content:flex-start;border-radius:9px;width:100%"><input type="radio" name="payment" value="I'd like to learn more"> 🤔 I'd like to learn more about my options</label>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goTo(5)">← Back</button>
+      <button class="btn btn-primary" onclick="goTo(7)">Review →</button>
+    </div>
+  </div>
+
+  <!-- ── STEP 7: REVIEW ── -->
+  <div class="card" id="step-7">
+    <div class="card-title">Review &amp; submit</div>
+    <div class="card-desc">Take a quick look — then hit submit and we'll have everything ready for your visit.</div>
+
+    <div id="reviewContent"></div>
+
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goTo(6)">← Edit</button>
+      <button class="btn btn-submit" onclick="submitForm()">✓ Submit</button>
+    </div>
+    <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:12px;">
+      Sylvan Learning may not be able to provide all accommodations to which the student may be entitled at school.
+    </div>
+  </div>
+
+  <!-- ── SUCCESS SCREEN ── -->
+  <div class="success-screen" id="successScreen">
+    <div class="success-icon">✓</div>
+    <div class="success-title">You're all set!</div>
+    <div class="success-msg" id="successMsg">
+      Thanks! Your information has been sent to our center.<br><br>
+      We'll have everything ready when you arrive.<br>
+      See you soon! 🎉
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<script>
+  // ── INIT ──
+  document.addEventListener('DOMContentLoaded', () => {
+    if (CENTER_NAME) {
+      document.getElementById('centerSubtitle').textContent = CENTER_NAME + ' — Welcome!';
+      document.title = 'Welcome to ' + CENTER_NAME;
+    }
+    initOptionBtns();
+    setupConditionals();
+  });
+
+  let currentStep = 1;
+  const TOTAL_STEPS = 7;
+
+  // ── PROGRESS UPDATE ──
+  function updateProgress(step) {
+    const pct = (step / TOTAL_STEPS) * 100;
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('stepCounter').textContent = 'Step ' + step + ' of ' + TOTAL_STEPS;
+    for (let i = 1; i <= TOTAL_STEPS; i++) {
+      const el = document.getElementById('pl-' + i);
+      el.className = 'progress-label' + (i < step ? ' done' : i === step ? ' active' : '');
+    }
+  }
+
+  // ── NAVIGATION ──
+  function goTo(step) {
+    if (step > currentStep && !validateStep(currentStep)) return;
+    document.getElementById('step-' + currentStep).classList.remove('active');
+    if (step === 7) buildReview();
+    document.getElementById('step-' + step).classList.add('active');
+    currentStep = step;
+    updateProgress(step);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // ── VALIDATION ──
+  function validateStep(step) {
+    let valid = true;
+    function check(fieldId, inputId, test) {
+      const f = document.getElementById(fieldId);
+      const v = document.getElementById(inputId).value.trim();
+      if (!test(v)) { f.classList.add('has-error'); valid = false; }
+      else f.classList.remove('has-error');
+    }
+    if (step === 1) {
+      check('f-studentName', 'studentName', v => v.length > 1);
+      check('f-studentDOB',  'studentDOB',  v => v.length > 0);
+      check('f-studentGrade','studentGrade', v => v.length > 0);
+    }
+    if (step === 2) {
+      check('f-parentName',  'parentName',  v => v.length > 1);
+      check('f-relationship','relationship', v => v.length > 0);
+      check('f-phone',       'phone',       v => v.length > 6);
+      check('f-email',       'email',       v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v));
+    }
+    if (step === 3) {
+      check('f-prompted',     'prompted',     v => v.length > 5);
+      check('f-mostImportant','mostImportant', v => v.length > 5);
+    }
+    return valid;
+  }
+
+  // ── OPTION BUTTONS (radio + checkbox) ──
+  function initOptionBtns() {
+    document.querySelectorAll('.option-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const inp = this.querySelector('input');
+        if (!inp) return;
+        if (inp.type === 'radio') {
+          const group = inp.closest('.option-group');
+          group.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+          this.classList.add('selected');
+          inp.checked = true;
+        } else {
+          inp.checked = !inp.checked;
+          this.classList.toggle('selected', inp.checked);
+        }
+        inp.dispatchEvent(new Event('change'));
+      });
+    });
+  }
+
+  // ── CONDITIONAL SECTIONS ──
+  function setupConditionals() {
+    // Previous Sylvan
+    document.querySelectorAll('input[name="prevSylvan"]').forEach(r => {
+      r.addEventListener('change', () => {
+        document.getElementById('prevSylvanDetails').classList.toggle('visible', r.value === 'Yes' && r.checked);
+      });
+    });
+    // Referral
+    document.getElementById('referral').addEventListener('change', function() {
+      const show = this.value === 'Friend or family referral';
+      document.getElementById('referralNameSection').classList.toggle('visible', show);
+    });
+    // IEP
+    document.querySelectorAll('input[name="iep"]').forEach(r => {
+      r.addEventListener('change', () => {
+        document.getElementById('iepDetails').classList.toggle('visible', r.value === 'Yes' && r.checked);
+      });
+    });
+  }
+
+  // ── TOGGLE PARENT 2 ──
+  function toggleParent2() {
+    const sec = document.getElementById('parent2Section');
+    const btn = document.getElementById('addParent2Btn');
+    const showing = sec.style.display !== 'none';
+    sec.style.display = showing ? 'none' : 'block';
+    btn.textContent = showing ? '＋ Add a second parent / guardian' : '✕ Remove second parent / guardian';
+  }
+
+  // ── HELPERS ──
+  function getRadio(name) {
+    const r = document.querySelector('input[name="' + name + '"]:checked');
+    return r ? r.value : '—';
+  }
+  function getChecked(groupId) {
+    const checked = [];
+    document.querySelectorAll('#' + groupId + ' input[type="checkbox"]:checked').forEach(c => checked.push(c.value));
+    return checked.length ? checked.join(', ') : 'None selected';
+  }
+  function val(id) { return document.getElementById(id).value.trim() || '—'; }
+
+  // ── BUILD REVIEW ──
+  function buildReview() {
+    const r = document.getElementById('reviewContent');
+    r.innerHTML = `
+      <div class="review-section">
+        <div class="review-section-title">Student</div>
+        <div class="review-row"><span class="review-key">Name</span><span class="review-val">${val('studentName')}</span></div>
+        <div class="review-row"><span class="review-key">DOB</span><span class="review-val">${val('studentDOB')}</span></div>
+        <div class="review-row"><span class="review-key">Grade</span><span class="review-val">${val('studentGrade')}</span></div>
+        <div class="review-row"><span class="review-key">School</span><span class="review-val">${val('studentSchool')}</span></div>
+        <div class="review-row"><span class="review-key">Siblings</span><span class="review-val">${val('siblings')}</span></div>
+      </div>
+      <div class="review-section">
+        <div class="review-section-title">Contact</div>
+        <div class="review-row"><span class="review-key">Parent/Guardian</span><span class="review-val">${val('parentName')} (${val('relationship')})</span></div>
+        <div class="review-row"><span class="review-key">Phone</span><span class="review-val">${val('phone')} [${val('phoneType')}]</span></div>
+        <div class="review-row"><span class="review-key">Email</span><span class="review-val">${val('email')}</span></div>
+        <div class="review-row"><span class="review-key">Preferred contact</span><span class="review-val">${getRadio('contactPref')}</span></div>
+        <div class="review-row"><span class="review-key">SMS consent</span><span class="review-val">${document.getElementById('smsConsent1').checked ? 'Yes' : 'No'}</span></div>
+      </div>
+      <div class="review-section">
+        <div class="review-section-title">Why You're Here</div>
+        <div class="review-row"><span class="review-key">Prompted by</span><span class="review-val">${val('prompted')}</span></div>
+        <div class="review-row"><span class="review-key">Most important topic</span><span class="review-val">${val('mostImportant')}</span></div>
+        <div class="review-row"><span class="review-key">Prior Sylvan</span><span class="review-val">${getRadio('prevSylvan')}</span></div>
+        <div class="review-row"><span class="review-key">Referred by</span><span class="review-val">${val('referral')}${val('referralName') !== '—' ? ' — ' + val('referralName') : ''}</span></div>
+      </div>
+      <div class="review-section">
+        <div class="review-section-title">Student Profile</div>
+        <div class="review-row"><span class="review-key">Performance level</span><span class="review-val">${getRadio('gradeLevel')}</span></div>
+        <div class="review-row"><span class="review-key">Areas for improvement</span><span class="review-val">${getChecked('subjects')}</span></div>
+        <div class="review-row"><span class="review-key">IEP / accommodations</span><span class="review-val">${getRadio('iep')}</span></div>
+      </div>
+      <div class="review-section">
+        <div class="review-section-title">Goals</div>
+        <div class="review-row"><span class="review-key">Goals</span><span class="review-val">${val('goals')}</span></div>
+        <div class="review-row"><span class="review-key">Timeline</span><span class="review-val">${getRadio('timeline')}</span></div>
+        <div class="review-row"><span class="review-key">Other notes</span><span class="review-val">${val('anythingElse')}</span></div>
+      </div>
+      <div class="review-section">
+        <div class="review-section-title">Scheduling &amp; Preferences</div>
+        <div class="review-row"><span class="review-key">Days unavailable</span><span class="review-val">${getChecked('unavailDays')}</span></div>
+        <div class="review-row"><span class="review-key">Best time to reach</span><span class="review-val">${getChecked('bestTime')}</span></div>
+        <div class="review-row"><span class="review-key">Payment preference</span><span class="review-val">${getRadio('payment')}</span></div>
+      </div>`;
+  }
+
+  // ── SUBMIT ──
+  async function submitForm() {
+    const btn = document.querySelector('.btn-submit');
+    btn.textContent = 'Sending…';
+    btn.disabled = true;
+
+    const data = {
+      center: CENTER_NAME,
+      // Student
+      studentName:    val('studentName'),
+      studentDOB:     val('studentDOB'),
+      studentGrade:   val('studentGrade'),
+      studentSchool:  val('studentSchool'),
+      siblings:       val('siblings'),
+      // Parent 1
+      parentName:     val('parentName'),
+      relationship:   val('relationship'),
+      phone:          val('phone') + ' [' + val('phoneType') + ']',
+      email:          val('email'),
+      contactPref:    getRadio('contactPref'),
+      smsConsent:     document.getElementById('smsConsent1').checked ? 'Yes' : 'No',
+      // Parent 2
+      parent2Name:    val('parent2Name'),
+      phone2:         val('phone2') + ' [' + val('phoneType2') + ']',
+      email2:         val('email2'),
+      smsConsent2:    document.getElementById('smsConsent2').checked ? 'Yes' : 'No',
+      // Why here
+      prompted:       val('prompted'),
+      mostImportant:  val('mostImportant'),
+      prevSylvan:     getRadio('prevSylvan'),
+      prevSylvanWhere:val('prevSylvanWhere'),
+      referral:       val('referral'),
+      referralName:   val('referralName'),
+      // Profile
+      gradeLevel:     getRadio('gradeLevel'),
+      subjects:       getChecked('subjects'),
+      iep:            getRadio('iep'),
+      iepDesc:        val('iepDesc'),
+      shareIEP:       getRadio('shareIEP'),
+      // Goals
+      goals:          val('goals'),
+      timeline:       getRadio('timeline'),
+      anythingElse:   val('anythingElse'),
+      // Scheduling
+      unavailDays:    getChecked('unavailDays'),
+      bestTime:       getChecked('bestTime'),
+      paymentPref:    getRadio('payment'),
+      // Meta
+      submittedAt:    new Date().toLocaleString()
+    };
+
+    try {
+      const res = await fetch(FORMSPREE_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      if (res.ok) {
+        document.getElementById('step-7').classList.remove('active');
+        const ss = document.getElementById('successScreen');
+        ss.classList.add('active');
+        document.getElementById('successMsg').innerHTML =
+          `Thanks, <strong>${val('parentName')}</strong>!<br><br>
+           We've received your information for <strong>${val('studentName')}</strong> and we'll have everything ready when you arrive.<br><br>
+           See you soon! 🎉`;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        throw new Error('Server error');
+      }
+    } catch(e) {
+      btn.textContent = '✓ Submit';
+      btn.disabled = false;
+      alert('Something went wrong submitting the form. Please try again or ask our team for help.');
+    }
+  }
+</script>
+</body>
+</html>
